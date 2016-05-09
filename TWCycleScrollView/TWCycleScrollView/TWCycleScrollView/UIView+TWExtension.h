@@ -18,4 +18,6 @@
 @property (nonatomic, assign) CGFloat tw_y;
 @property (nonatomic, assign) CGFloat tw_x;
 
+
+- (UIViewController*)viewController;
 @end

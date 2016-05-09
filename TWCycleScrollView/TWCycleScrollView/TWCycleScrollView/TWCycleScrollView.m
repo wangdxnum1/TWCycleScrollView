@@ -40,6 +40,13 @@
     [self setupMainView];
 }
 
+- (void)didMoveToSuperview{
+    [super didMoveToSuperview];
+    // navgation controller 关闭自动调整insets
+    UIViewController *parentVc = [self viewController];
+    parentVc.automaticallyAdjustsScrollViewInsets = NO;
+}
+
 #pragma mark - public method
 
 - (void)scrollToNextPage{

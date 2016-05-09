@@ -34,16 +34,18 @@
     
     NSArray *imageNames = @[view1,view2,view3,view4];
      CGFloat w = self.view.bounds.size.width;
-    TWCycleScrollView *cycleScrollView = [TWCycleScrollView cycleScrollViewWithFrame:CGRectMake(0, 64, w, 180) shouldInfiniteLoop:YES viewsGroup:imageNames];
+    TWCycleScrollView *cycleScrollView = [TWCycleScrollView cycleScrollViewWithFrame:CGRectMake(0, 100, w, 180) shouldInfiniteLoop:YES viewsGroup:imageNames];
     cycleScrollView.delegate = self;
     [self.view addSubview:cycleScrollView];
     self.cycleScrollView = cycleScrollView;
+    
+//    self.automaticallyAdjustsScrollViewInsets = NO;
 }
-- (IBAction)preBtnClicked:(UIButton *)sender {
+- (IBAction)prevBtnClicked:(UIBarButtonItem *)sender {
     [self.cycleScrollView scrollToPreviousPage];
 }
 
-- (IBAction)nextBtnClicked:(UIButton *)sender {
+- (IBAction)nextBtnClicked:(UIBarButtonItem *)sender {
     [self.cycleScrollView scrollToNextPage];
 }
 
