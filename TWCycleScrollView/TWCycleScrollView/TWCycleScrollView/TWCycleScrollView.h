@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+
 typedef enum {
     TWCycleScrollViewPageContolAlimentRight,
     TWCycleScrollViewPageContolAlimentCenter
@@ -18,29 +19,21 @@ typedef enum {
 
 @optional
 
-/** 点击图片回调 */
 - (void)cycleScrollView:(TWCycleScrollView *)cycleScrollView didSelectItemAtIndex:(NSInteger)index;
 
-/** 图片滚动回调 */
 - (void)cycleScrollView:(TWCycleScrollView *)cycleScrollView didScrollToIndex:(NSInteger)index;
 
 @end
 
 @interface TWCycleScrollView : UIView
 
-// >>>>>>>>>>>>>>>>>>>>>>>>>>  数据源接口
+// 数据源接口
 @property (nonatomic, strong) NSArray *contentViewsGroup;
 
-// >>>>>>>>>>>>>>>>>>>>>>>>>  滚动控制接口
-
-/** 自动滚动间隔时间,默认2s */
-@property (nonatomic, assign) CGFloat autoScrollTimeInterval;
+// 滚动控制接口
 
 /** 是否无限循环,默认Yes */
 @property(nonatomic,assign) BOOL infiniteLoop;
-
-/** 是否自动滚动,默认Yes */
-@property(nonatomic,assign) BOOL autoScroll;
 
 @property (nonatomic, weak) id<TWCycleScrollViewDelegate> delegate;
 
@@ -48,12 +41,12 @@ typedef enum {
 @property (nonatomic, copy) void (^clickItemOperationBlock)(NSInteger currentIndex);
 
 
-// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>  自定义样式接口
+// 自定义样式接口
 
 /** 是否显示分页控件 */
 @property (nonatomic, assign) BOOL showPageControl;
 
-/** 是否在只有一张图时隐藏pagecontrol，默认为YES */
+/** 是否在只有个view时隐藏pagecontrol，默认为YES */
 @property(nonatomic) BOOL hidesForSinglePage;
 
 /** 分页控件位置 */
@@ -74,5 +67,11 @@ typedef enum {
 
 
 + (instancetype)cycleScrollViewWithFrame:(CGRect)frame shouldInfiniteLoop:(BOOL)infiniteLoop viewsGroup:(NSArray *)viewsGroup;
+
+// scroll 到下一页
+- (void)scrollToNextPage;
+
+// scroll 到上一页
+- (void)scrollToPreviousPage;
 
 @end

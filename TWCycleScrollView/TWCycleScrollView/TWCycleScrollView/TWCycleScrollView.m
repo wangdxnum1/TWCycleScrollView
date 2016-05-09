@@ -15,10 +15,9 @@
 
 @interface TWCycleScrollView ()<UICollectionViewDelegate,UICollectionViewDataSource>
 
-@property (nonatomic, weak) UICollectionView *mainView; // 显示图片的collectionView
+@property (nonatomic, weak) UICollectionView *mainView; // 显示view的collectionView
 @property (nonatomic, weak) UICollectionViewFlowLayout *flowLayout;
 
-@property (nonatomic, weak) NSTimer *timer;
 @property (nonatomic, assign) NSInteger totalItemsCount;
 @property (nonatomic, weak) UIControl *pageControl;
 
@@ -41,12 +40,20 @@
     [self setupMainView];
 }
 
+#pragma mark - public method
+
+- (void)scrollToNextPage{
+    [self automaticScroll:1];
+}
+
+- (void)scrollToPreviousPage{
+    [self automaticScroll:-1];
+}
+
 - (void)initialization
 {
     _pageControlAliment = TWCycleScrollViewPageContolAlimentCenter;
-    _autoScrollTimeInterval = 2.0;
 
-    _autoScroll = NO;
     _infiniteLoop = YES;
     _showPageControl = YES;
     _hidesForSinglePage = YES;
@@ -74,7 +81,7 @@
 }
 
 
-// 设置显示图片的collectionView
+// 设置显示view的collectionView
 - (void)setupMainView
 {
     UICollectionViewFlowLayout *flowLayout = [[UICollectionViewFlowLayout alloc] init];
@@ -137,23 +144,6 @@
     }
 }
 
--(void)setAutoScroll:(BOOL)autoScroll{
-    _autoScroll = autoScroll;
-    [_timer invalidate];
-    _timer = nil;
-    
-    if (_autoScroll) {
-        [self setupTimer];
-    }
-}
-
-- (void)setAutoScrollTimeInterval:(CGFloat)autoScrollTimeInterval
-{
-    _autoScrollTimeInterval = autoScrollTimeInterval;
-    
-    [self setAutoScroll:self.autoScroll];
-}
-
 - (void)setContentViewsGroup:(NSArray *)contentViewsGroup
 {
     _contentViewsGroup = contentViewsGroup;
@@ -169,7 +159,6 @@
     
     if (contentViewsGroup.count != 1) {
         self.mainView.scrollEnabled = YES;
-        [self setAutoScroll:self.autoScroll];
     } else {
         self.mainView.scrollEnabled = NO;
     }
@@ -197,12 +186,11 @@
     _pageControl = pageControl;
 }
 
-
-- (void)automaticScroll
+- (void)automaticScroll:(NSInteger)page
 {
     if (0 == _totalItemsCount) return;
     int currentIndex = _mainView.contentOffset.x / _flowLayout.itemSize.width;
-    int targetIndex = currentIndex + 1;
+    NSInteger targetIndex = currentIndex + page;
     if (targetIndex == _totalItemsCount) {
         if (self.infiniteLoop) {
             targetIndex = _totalItemsCount * 0.5;
@@ -212,14 +200,10 @@
         [_mainView scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:targetIndex inSection:0] atScrollPosition:UICollectionViewScrollPositionNone animated:NO];
         return;
     }
+    if(!self.infiniteLoop && (targetIndex < 0 || targetIndex > _totalItemsCount)){
+        return;
+    }
     [_mainView scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:targetIndex inSection:0] atScrollPosition:UICollectionViewScrollPositionNone animated:YES];
-}
-
-- (void)setupTimer
-{
-    NSTimer *timer = [NSTimer scheduledTimerWithTimeInterval:self.autoScrollTimeInterval target:self selector:@selector(automaticScroll) userInfo:nil repeats:YES];
-    _timer = timer;
-    [[NSRunLoop mainRunLoop] addTimer:timer forMode:NSRunLoopCommonModes];
 }
 
 #pragma mark - life circles
@@ -252,21 +236,6 @@
     
     self.pageControl.frame = CGRectMake(x, y, size.width, size.height);
     self.pageControl.hidden = !_showPageControl;
-}
-
-//解决当父View释放时，当前视图因为被Timer强引用而不能释放的问题
-- (void)willMoveToSuperview:(UIView *)newSuperview
-{
-    if (!newSuperview) {
-        [_timer invalidate];
-        _timer = nil;
-    }
-}
-
-//解决当timer释放后 回调scrollViewDidScroll时访问野指针导致崩溃
-- (void)dealloc {
-    _mainView.delegate = nil;
-    _mainView.dataSource = nil;
 }
 
 #pragma mark - public actions
@@ -323,17 +292,12 @@
 
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
 {
-    if (self.autoScroll) {
-        [_timer invalidate];
-        _timer = nil;
-    }
+
 }
 
 - (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate
 {
-    if (self.autoScroll) {
-        [self setupTimer];
-    }
+   
 }
 
 - (void)scrollViewDidEndScrollingAnimation:(UIScrollView *)scrollView
@@ -345,6 +309,12 @@
     if ([self.delegate respondsToSelector:@selector(cycleScrollView:didScrollToIndex:)]) {
         [self.delegate cycleScrollView:self didScrollToIndex:indexOnPageControl];
     }
+}
+
+#pragma makr - dealloc
+- (void)dealloc {
+    _mainView.delegate = nil;
+    _mainView.dataSource = nil;
 }
 
 @end

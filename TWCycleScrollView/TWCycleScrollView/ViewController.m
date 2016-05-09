@@ -10,7 +10,7 @@
 #import "TWCycleScrollView.h"
 
 @interface ViewController () <TWCycleScrollViewDelegate>
-
+@property (nonatomic, weak) TWCycleScrollView *cycleScrollView;
 @end
 
 @implementation ViewController
@@ -19,7 +19,6 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
     
-    // 情景一：采用本地图片实现
     UIView *view1 = [[UIView alloc] initWithFrame:CGRectZero];
     view1.backgroundColor = [UIColor redColor];
     
@@ -38,15 +37,21 @@
     TWCycleScrollView *cycleScrollView = [TWCycleScrollView cycleScrollViewWithFrame:CGRectMake(0, 64, w, 180) shouldInfiniteLoop:YES viewsGroup:imageNames];
     cycleScrollView.delegate = self;
     [self.view addSubview:cycleScrollView];
-
+    self.cycleScrollView = cycleScrollView;
 }
+- (IBAction)preBtnClicked:(UIButton *)sender {
+    [self.cycleScrollView scrollToPreviousPage];
+}
+
+- (IBAction)nextBtnClicked:(UIButton *)sender {
+    [self.cycleScrollView scrollToNextPage];
+}
+
 #pragma mark - SDCycleScrollViewDelegate
 
 - (void)cycleScrollView:(TWCycleScrollView *)cycleScrollView didSelectItemAtIndex:(NSInteger)index
 {
-    NSLog(@"---点击了第%ld张图片", (long)index);
-    
-    [self.navigationController pushViewController:[NSClassFromString(@"DemoVCWithXib") new] animated:YES];
+    NSLog(@"--->>>点击了第%ld个view", (long)index);
 }
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
